@@ -38,8 +38,11 @@ func GetBookById(w http.ResponseWriter, r *http.Request) {
 
 // CreateBook function
 func CreateBook(w http.ResponseWriter, r *http.Request) {
-	CreateBook := models.Book{}
-	utils.ParseBody(r, CreateBook)
+	CreateBook := &models.Book{}
+	if err := utils.ParseBody(r, CreateBook); err != nil {
+		http.Error(w, "Failed to parse request body: "+err.Error(), http.StatusBadRequest)
+		return
+	}
 	b := CreateBook.CreateBook()
 	res, _ := json.Marshal(b)
 	w.Header().Set("Content-Type", "application/json")
@@ -65,7 +68,7 @@ func DeleteBook(w http.ResponseWriter, r *http.Request) {
 // UpdateBook function
 func UpdateBook(w http.ResponseWriter, r *http.Request) {
 	var updateBook models.Book
-	utils.ParseBody(r, updateBook)
+	utils.ParseBody(r, &updateBook)
 
 	vars := mux.Vars(r)
 	bookId := vars["bookId"]
