@@ -68,8 +68,10 @@ func DeleteBook(w http.ResponseWriter, r *http.Request) {
 // UpdateBook function
 func UpdateBook(w http.ResponseWriter, r *http.Request) {
 	var updateBook models.Book
-	utils.ParseBody(r, &updateBook)
-
+	if err := utils.ParseBody(r, &updateBook); err != nil {
+		http.Error(w, "Failed to parse request body: "+err.Error(), http.StatusBadRequest)
+		return
+	}
 	vars := mux.Vars(r)
 	bookId := vars["bookId"]
 	ID, err := strconv.ParseInt(bookId, 0, 0)
